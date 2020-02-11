@@ -1,7 +1,9 @@
 class CreateUserLocations < ActiveRecord::Migration
     def change
-        create_table :something do |t|
-
+        create_table :user_locations do |t|
+            t.string :name
+            t.integer :user_id
+            t.integer :location_id
         end
     end
 end
