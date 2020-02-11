@@ -1,2 +1,2 @@
-# vaction-weater-app
+# vaction-weather-app
 Find your next dream vacation location 
