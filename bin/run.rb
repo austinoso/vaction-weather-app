@@ -1,1 +1,3 @@
-puts "Hello this is a test of the run.rb file"
+require_relative '../config/environment'
+
+puts "testing run file"
