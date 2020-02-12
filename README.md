@@ -1,7 +1,7 @@
 # vaction-weather-app
 Find your next dream vacation location
 
-## Current Commadns
+## Current Commands
 ```ruby
 Location.search #generates new travel location
 
