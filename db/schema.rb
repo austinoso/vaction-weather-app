@@ -14,9 +14,9 @@ ActiveRecord::Schema.define(version: 4) do
 
   create_table "locations", force: :cascade do |t|
     t.string "name"
+    t.string "country"
     t.float "latitude"
     t.float "longitude"
-    t.integer "weather_id"
   end
 
   create_table "user_locations", force: :cascade do |t|
