@@ -152,7 +152,7 @@ class UserSession
     def read_profile 
         puts "Here is your current profile"
         puts "username: #{@current_user.username}"
-        puts "current temp preference: #{@current_user.temp_pref}"
+        puts "current temp preference:#{@current_user.temp_pref}"
     end
 
 end
