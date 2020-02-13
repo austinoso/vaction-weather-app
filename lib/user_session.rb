@@ -2,27 +2,21 @@ class UserSession
     attr_accessor :current_user, :commands
 
     def initialize
-        @commands = [
-            "'help' - Displays available commands",
-            "'temp' - Allows the user to temp their recommended temperature",
-            "'search' - Searches for a new Travel Location",
-            "'locations' - Returns a list of the users saved locations"
-        ]
         welcome
+        start
     end
 
     def welcome
         puts "#" * 25
         puts "Welcome to Trip Finder!"
         puts "#" * 25
-        @c
     end
     
     def login
         puts "Please Login"
-        puts "Enter username"
+        puts "\nEnter username"
         username = gets.chomp
-        puts "Enter password"
+        puts "\nEnter password"
         password = gets.chomp
         if validate(username,password)
             set_user(username, password)
@@ -54,22 +48,39 @@ class UserSession
         @current_user = User.create(username: username, password: password)
     end
 
-    def temp
-        if !self.current_user.temp_pref
-            self.ask_temp_pref
+    def set_user_temp
+        if @current_user.highest_temp == nil || @current_user.lowest_temp == nil
+            puts "\nYou're temperature preferences aren't set."
+            puts "Would you like to add them? Y/n"
+            if gets.chomp == 'Y'
+                self.prompt_user_to_set_temp
+            end
         else
-            puts "\nYour prefered temperature is #{@current_user.temp_pref}"
+            puts "\nYour maximum and lowest set temperatures are #{@current_user.highest_temp}F and #{@current_user.lowest_temp}F"
             puts "Would you like to change it? Y/n"
             if gets.chomp == 'Y'
-                self.ask_temp_pref
+                self.prompt_user_to_set_temp
             end
         end
     end
     
-    def ask_temp_pref
-        puts "\nWhat temperature do you prefer? 'cold' or 'hot'"
-        @current_user.set_temp_pref(gets.chomp)
-        puts "Current temperature set to #{@current_user.temp_pref}"
+    def prompt_user_to_set_temp
+        puts "What temperature is too hot for you?"
+        max = gets.chomp
+        puts "What temperature is too cold for you?"
+        min = gets.chomp
+        if validate_temps(max, min)
+            @current_user.set_temps(max, min)
+        end
+    end
+
+    def validate_temps(max, min)
+        if max < min
+            puts "Your max temperature can't be lower than your min."
+            set_temp_pref
+        else
+            true
+        end
     end
     
     def find_user(username)
@@ -81,7 +92,7 @@ class UserSession
         puts "You're logged in as #{@current_user.username}"
     end
 
-    def new_location
+    def generate_new_location
         location = Location.search
         puts "Welcome to beauitful #{location.name}, #{location.country}"
         puts 'Would you like to save this location to your "Travel List"? Y/n'
@@ -94,13 +105,79 @@ class UserSession
 
     def user_locations_list
         UserLocation.all.where(user: @current_user).map do |user_location|
-            puts "=" * 20
-            puts "#{user_location.location.name}, #{user_location.location.country}"
+            location = user_location.location
+            puts "=" * 25
+            puts "#{location.name}, #{location.country}"
+            weather_data = location.weather_api(location.latitude, location.longitude)
+            location.weather(weather_data)
         end
     end
 
     def whoami
         puts "\nYou're logged in as #{current_user.username}"
+    end
+
+    def print_commands
+        if !@current_user
+            @commands = [
+                "'help' - Displays available commands",
+                "'login' - Prompts a user to login",
+                "'signup' - Allows a user to create an account",
+                "'exit' - Closes the program"
+            ]
+        else
+            @commands = [
+                "'help' - Displays available commands",
+                "'temp' - Allows the user to temp their recommended temperature",
+                "'search' - Searches for a new Travel Location",
+                "'locations' - Returns a list of the users saved locations",
+                "'logout' - Logs out a user",
+                "'whoami' - Tells the users whos currently logged in",
+                "'exit' - Closes the program"
+            ]     
+        end
+        puts @commands
+    end
+
+    def start
+        while self
+            while @current_user
+                puts "\nWhat would like to do?"
+                puts "Type 'help' for a list of commands"
+    
+                case gets.chomp
+                when "help"
+                    self.print_commands
+                when "temp"
+                    self.set_user_temp
+                when "search"
+                    self.generate_new_location
+                when "locations"
+                    self.user_locations_list
+                when "logout"
+                    self.logout
+                when "whoami"
+                    self.whoami
+                when "exit"
+                    abort("Ending program... goodbye!")
+                end
+            end
+            
+            while !@current_user
+                puts "\nPlease 'login' or 'signup' to countinue"
+            
+                case gets.chomp
+                when "login"
+                    self.login
+                when "signup"
+                    self.create_user
+                when "help"
+                    self.print_commands
+                when "exit"
+                    abort("Ending program... goodbye!")
+                end    
+            end
+        end
     end
 
 end
