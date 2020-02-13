@@ -4,12 +4,13 @@ class UserSession
     def initialize
         @commands = [
             "'help' - Displays available commands",
-            "'temp' - Allows the user to temp their recommended temperature",
+            "'temp' - Allows the user to set their recommended temperature",
             "'search' - Searches for a new Travel Location",
             "'locations' - Returns a list of the users saved locations",
             "'delete' - Deletes the current user",
-            "'update_name' - Updates the current users username",
-            "'update_password' - Updates the current users username"
+            "'update name' - Updates the current users username",
+            "'update password' - Updates the current users username",
+            "'read profile' - Shows profile of current user" 
         ]
         welcome
     end
@@ -18,7 +19,6 @@ class UserSession
         puts "#" * 25
         puts "Welcome to Trip Finder!"
         puts "#" * 25
-        @c
     end
     
     def login
@@ -147,6 +147,12 @@ class UserSession
         else
             puts "Ok we will keep your current password, no changes made."
         end
+    end
+
+    def read_profile 
+        puts "Here is your current profile"
+        puts "username: #{@current_user.username}"
+        puts "current temp preference: #{@current_user.temp_pref}"
     end
 
 end
