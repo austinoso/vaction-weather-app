@@ -75,4 +75,10 @@ class UserSession
         end
     end
 
+    def user_locations_list
+        UserLocation.all.where(user: @current_user).map do |user_location|
+            puts "#{user_location.location.name}, #{user_location.location.country}"
+        end
+    end
+
 end

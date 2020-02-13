@@ -14,6 +14,8 @@ while current_session && current_session.current_user
         current_session.temp
     when "search"
         current_session.new_location
+    when "my locations"
+        current_session.user_locations_list
     when "exit"
         current_session = nil
     end
