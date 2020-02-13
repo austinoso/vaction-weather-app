@@ -25,6 +25,7 @@ class User < ActiveRecord::Base
             puts "You didn't enter a vaild temperature."
             puts 'Please enter either "cold" or "hot" or leave blank for no preference.'
         end
+        self.save
     end
 
 end
