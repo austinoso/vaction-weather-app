@@ -1,14 +1,10 @@
-# vaction-weather-app
+# Random Vacation App
 Find your next dream vacation location
 
 ## Current Commands
 ```ruby
-Location.search #generates new travel location
-
-=> #<Location:0x00007f9c191fa4e8
- id: 1,
- name: "Saint George's Hill",
- country: "Montserrat",
- latitude: 16.7166667,
- longitude: -62.2>
+'help' - Displays available commands
+'temp' - Allows the user to temp their recommended temperature
+'search' - Searches for a new Travel Location
+'locations' - Returns a list of the users saved locations
 ```
