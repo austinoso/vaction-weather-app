@@ -3,7 +3,7 @@ require_relative '../config/environment.rb'
 current_session = UserSession.new
 
 while current_session && !current_session.current_user
-    puts "\nPlease 'login' or 'sign' to countinue"
+    puts "\nPlease 'login' or 'signup' to countinue"
 
     case gets.chomp
     when "login"
@@ -37,6 +37,8 @@ while current_session && current_session.current_user
         current_session.whoami
     when "exit"
         current_session = nil
+    when "delete"
+        current_session.can_destroy_profile
     end
 
 end

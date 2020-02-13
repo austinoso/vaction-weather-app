@@ -6,7 +6,8 @@ class UserSession
             "'help' - Displays available commands",
             "'temp' - Allows the user to temp their recommended temperature",
             "'search' - Searches for a new Travel Location",
-            "'locations' - Returns a list of the users saved locations"
+            "'locations' - Returns a list of the users saved locations",
+            "'delete' - Deletes the current user"
         ]
         welcome
     end
@@ -42,7 +43,7 @@ class UserSession
     end
 
     def create_user
-        puts "What should be call you?"
+        puts "What should we call you?"
         username = gets.chomp
         while find_user(username)
             puts "User already exists with that name."
@@ -83,7 +84,7 @@ class UserSession
 
     def new_location
         location = Location.search
-        puts "Welcome to beauitful #{location.name}, #{location.country}"
+        puts "Welcome to beautiful #{location.name}, #{location.country}"
         puts 'Would you like to save this location to your "Travel List"? Y/n'
 
         if gets.chomp == 'Y'
@@ -101,6 +102,19 @@ class UserSession
 
     def whoami
         puts "You're logged in as #{current_user.username}"
+    end
+
+    ###### New code below ######
+    
+    def can_destroy_profile
+        puts "delete the profile of #{@current_user.username}? If yes answer with Y"
+        response = gets.chomp()
+        if response == "Y" 
+            @current_user.delete
+            puts "#{@current_user.username} has been deleted"
+        else
+            puts "Ok deletion averted"
+        end
     end
 
 end
