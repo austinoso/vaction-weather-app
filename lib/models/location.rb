@@ -11,21 +11,24 @@ class Location < ActiveRecord::Base
     def weather_api(latitude,longtitude)
         weather_data = RestClient.get("https://api.darksky.net/forecast/773a54e5e33804db37622417cee9961e/#{latitude},#{longtitude}")
         response_hash = JSON.parse(weather_data)
-        puts response_hash
     end
     
-    def current_temp()
-        #last two float numbers are the coordinates which need to be plugged in
-        weather_data = RestClient.get("https://api.darksky.net/forecast/773a54e5e33804db37622417cee9961e/42.3601,-71.0589")
-        response_hash = JSON.parse(weather_data)
-        puts "Current temp is: #{response_hash["currently"]["temperature"] + 32.round}F"
+    def current_temp(weather_data)
+        puts "Current temp is: #{weather_data["currently"]["temperature"].round(2)}F"
     end
     
-    def current_humidity()
-        #last two float numbers are the coordinates which need to be plugged in
-        weather_data = RestClient.get("https://api.darksky.net/forecast/773a54e5e33804db37622417cee9961e/42.3601,-71.0589")
-        response_hash = JSON.parse(weather_data)
-        puts "Current humidity is: #{response_hash["currently"]["humidity"] *100}%"
+    def current_humidity(weather_data)
+        puts "Current humidity is: #{weather_data["currently"]["humidity"] *100}%"
+    end
+
+    def current_status(weather_data)
+        puts "#{weather_data["currently"]["summary"]}"
+    end
+
+    def weather(weather_data)
+        current_temp(weather_data)
+        current_humidity(weather_data)
+        current_status(weather_data)
     end
     
     
