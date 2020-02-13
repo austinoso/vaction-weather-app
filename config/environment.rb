@@ -1,8 +1,10 @@
-# require 'rest-client'
-require 'JSON'
+require 'rest-client'
+require 'json'
 require 'bundler'
 require 'cities'
 require 'countries/global'
+require 'pry'
+require 'pp'
 
 Cities.data_path = 'db/cities'
 
