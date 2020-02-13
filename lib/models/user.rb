@@ -14,20 +14,21 @@ class User < ActiveRecord::Base
         else
             self.max_humidity = humidity_percent
         end
+        self.saves
     end
 
-    def set_temp_pref(temp)
-        if temp == "cold"
-            self.temp_pref = temp
-        elsif temp == "hot"
-            self.temp_pref = temp
-        elsif temp == "nil"
-            self.temp = nil
-        else
-            puts "You didn't enter a vaild temperature."
-            puts 'Please enter either "cold" or "hot" or "nil" for no preference.'
-        end
+    def set_temps(max, min)
+        self.highest_temp = max
+        self.lowest_temp = min
         self.save
+        puts "\nPreferences saved!"
+        puts "\nYour maximum and lowest set temperatures are #{self.highest_temp}F and #{self.lowest_temp}F"
     end
 
+    def get_temps
+        temps = {
+            max_temp: self.highest_temp.to_f, 
+            min_temp: self.lowest_temp.to_f
+        }
+    end
 end

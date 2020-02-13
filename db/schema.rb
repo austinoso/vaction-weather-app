@@ -29,7 +29,8 @@ ActiveRecord::Schema.define(version: 5) do
   create_table "users", force: :cascade do |t|
     t.string "username"
     t.string "password"
-    t.string "temp_pref"
+    t.string "lowest_temp"
+    t.string "highest_temp"
     t.integer "max_humidity"
   end
 
