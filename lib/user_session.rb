@@ -71,7 +71,7 @@ class UserSession
 
         if gets.chomp == 'Y'
             puts "Location saved!"
-            #@current_user.locations = location
+            UserLocation.create(user: @current_user, location: location)
         end
     end
 
