@@ -5,17 +5,12 @@ require_relative '../config/environment.rb'
  
 
 
-
-def location_coordinates()
-    puts "enter your location"
-    results = gets.chomp()
-    location = Geocoder.search(results)
-    first_location = location.first.coordinates
-    first_location.split(",")
-    puts first_location
+def current_temp()
+    puts "Enter city that you would like to see the temperature of."
+    results = gets.chomp
+    weather_data = RestClient.get("https://api.darksky.net/forecast/773a54e5e33804db37622417cee9961e/42.3601,-71.0589")
+    response_hash = JSON.parse(weather_data)
+    puts "Current temp is: #{response_hash["currently"]["temperature"] + 32.round}F"
 end
 
-location_coordinates()
-
-# results = Geocoder.search("Paris")
-# puts results.first.coordinates
+current_temp()
