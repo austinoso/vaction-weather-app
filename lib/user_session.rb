@@ -5,7 +5,8 @@ class UserSession
         @commands = [
             "'help' - Displays available commands",
             "'temp' - Allows the user to temp their recommended temperature",
-            "'search' - Searches for a new Travel Location"
+            "'search' - Searches for a new Travel Location",
+            "'locations' - Returns a list of the users saved locations"
         ]
         welcome
         login
@@ -76,8 +77,9 @@ class UserSession
     end
 
     def user_locations_list
+        puts "\n"
         UserLocation.all.where(user: @current_user).map do |user_location|
-            puts "#{user_location.location.name}, #{user_location.location.country}"
+            puts "#{user_location.location.name}, #{user_location.location.country}\n "
         end
     end
 
