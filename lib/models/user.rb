@@ -21,9 +21,11 @@ class User < ActiveRecord::Base
             self.temp_pref = temp
         elsif temp == "hot"
             self.temp_pref = temp
+        elsif temp == "nil"
+            self.temp = nil
         else
             puts "You didn't enter a vaild temperature."
-            puts 'Please enter either "cold" or "hot" or leave blank for no preference.'
+            puts 'Please enter either "cold" or "hot" or "nil" for no preference.'
         end
         self.save
     end

@@ -9,7 +9,6 @@ class UserSession
             "'locations' - Returns a list of the users saved locations"
         ]
         welcome
-        login
     end
 
     def welcome
@@ -25,7 +24,34 @@ class UserSession
         username = gets.chomp
         puts "Enter password"
         password = gets.chomp
-        set_user(username, password)
+        if validate(username,password)
+            set_user(username, password)
+        else
+            puts "\nWrong username and password combination."
+            puts "Please try again or create an account."
+        end
+    end
+
+    def logout
+        puts "User #{@current_user.username} has logged out."
+        @current_user = nil
+    end
+
+    def validate(username, password)
+        User.find_by username: username, password: password
+    end
+
+    def create_user
+        puts "What should be call you?"
+        username = gets.chomp
+        while find_user(username)
+            puts "User already exists with that name."
+            puts "Please choose another"
+            username = gets.chomp
+        end
+        puts "Please enter a password."
+        password = gets.chomp
+        @current_user = User.create(username: username, password: password)
     end
 
     def temp
@@ -46,22 +72,13 @@ class UserSession
         puts "Current temperature set to #{@current_user.temp_pref}"
     end
     
-    def find_user(username, password)
-        User.find_by username: username, password: password
+    def find_user(username)
+        User.find_by username: username
     end
 
     def set_user(username, password)
-        if !find_user(username, password)
-            puts "No user found, would you like to create an account?"
-            puts "Y/n"
-            if gets.chomp== "Y"
-                @current_user = User.create(username: username, password: password)
-            else
-                puts "Oh.. I see..."
-            end
-        else
-            @current_user = find_user(username, password)
-        end
+        @current_user = User.find_by username: username, password: password
+        puts "You're logged in as #{@current_user.username}"
     end
 
     def new_location
@@ -80,6 +97,10 @@ class UserSession
             puts "=" * 20
             puts "#{user_location.location.name}, #{user_location.location.country}"
         end
+    end
+
+    def whoami
+        puts "You're logged in as #{current_user.username}"
     end
 
 end
