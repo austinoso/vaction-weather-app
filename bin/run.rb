@@ -39,6 +39,8 @@ while current_session && current_session.current_user
         current_session = nil
     when "delete"
         current_session.can_destroy_profile
+    when "update"
+        current_session.update_profile
     end
 
 end

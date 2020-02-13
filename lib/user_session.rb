@@ -7,7 +7,8 @@ class UserSession
             "'temp' - Allows the user to temp their recommended temperature",
             "'search' - Searches for a new Travel Location",
             "'locations' - Returns a list of the users saved locations",
-            "'delete' - Deletes the current user"
+            "'delete' - Deletes the current user",
+            "'update' - Updates the current users username"
         ]
         welcome
     end
@@ -114,6 +115,20 @@ class UserSession
             puts "#{@current_user.username} has been deleted"
         else
             puts "Ok deletion averted"
+        end
+    end
+
+    def update_profile
+        puts "change the username for #{@current_user.username}? If yes answer with Y"
+        response = gets.chomp 
+        if response == "Y"
+            puts "Enter your new username"
+            response2 = gets.chomp
+            @current_user.username = response2
+            puts "Your new username is #{response2}"
+            @current_user.save 
+        else
+            puts "Ok we will keep your current name of #{@current_user.username}"
         end
     end
 
