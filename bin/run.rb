@@ -3,7 +3,7 @@ require_relative '../config/environment'
 current_session = UserSession.new
 
 while current_session && current_session.current_user
-    puts "What would to do?"
+    puts "What would like to do?"
     puts "Type 'help' for a list of commands"
     command = gets.chomp
 
@@ -20,5 +20,3 @@ while current_session && current_session.current_user
         current_session = nil
     end
 end
-
-#command = gets.chomp

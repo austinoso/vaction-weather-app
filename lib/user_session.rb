@@ -54,8 +54,7 @@ class UserSession
         if !find_user(username, password)
             puts "No user found, would you like to create an account?"
             puts "Y/n"
-            response = gets.chomp
-            if response == "Y"
+            if gets.chomp== "Y"
                 @current_user = User.create(username: username, password: password)
             else
                 puts "Oh.. I see..."
@@ -77,9 +76,9 @@ class UserSession
     end
 
     def user_locations_list
-        puts "\n"
         UserLocation.all.where(user: @current_user).map do |user_location|
-            puts "#{user_location.location.name}, #{user_location.location.country}\n "
+            puts "=" * 20
+            puts "#{user_location.location.name}, #{user_location.location.country}"
         end
     end
 
