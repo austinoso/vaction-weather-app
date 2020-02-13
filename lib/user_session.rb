@@ -133,7 +133,11 @@ class UserSession
                 "'locations' - Returns a list of the users saved locations",
                 "'logout' - Logs out a user",
                 "'whoami' - Tells the users whos currently logged in",
-                "'exit' - Closes the program"
+                "'exit' - Closes the program",
+                "'delete' - Deletes the current user",
+                "'update name' - Updates the current users username",
+                "'update password' - Updates the current users username",
+                "'read profile' - Shows profile of current user" 
             ]     
         end
         puts @commands
@@ -158,6 +162,14 @@ class UserSession
                     self.logout
                 when "whoami"
                     self.whoami
+                when "delete"
+                    self.can_destroy_profile
+                when "update name"
+                    self.update_profile_name
+                when "update password"
+                    self.update_profile_password
+                when "read profile"
+                    self.read_profile 
                 when "exit"
                     abort("Ending program... goodbye!")
                 end
@@ -179,5 +191,56 @@ class UserSession
             end
         end
     end
+
+    ###### New code below ######
+    
+    def can_destroy_profile
+        puts "delete the profile of #{@current_user.username}? If yes answer with Y"
+        response = gets.chomp()
+        if response == "Y" 
+            @current_user.delete
+            puts "#{@current_user.username} has been deleted"
+        else
+            puts "Ok deletion averted"
+        end
+    end
+
+    def update_profile_name
+        puts "change the username for #{@current_user.username}? If yes answer with Y"
+        response = gets.chomp 
+        
+        if response == "Y"
+            puts "Enter your new username"
+            response2 = gets.chomp
+            @current_user.username = response2
+            puts "Your new username is #{response2}"
+            @current_user.save 
+        else
+            puts "Ok we will keep your current name of #{@current_user.username}"
+        end
+    end
+
+    def update_profile_password
+        puts "change the password for #{@current_user.username}? If yes answer with Y"
+        response = gets.chomp 
+
+        if response == "Y"
+            puts "Enter your new password"
+            response2 = gets.chomp
+            @current_user.password = response2
+            puts "Your new password is #{response2}"
+            @current_user.save 
+        else
+            puts "Ok we will keep your current password, no changes made."
+        end
+    end
+
+
+    def read_profile 
+        puts "Here is your current profile"
+        puts "username: #{@current_user.username}"
+        puts "Your maximum and lowest set temperatures are #{@current_user.highest_temp}F and #{@current_user.lowest_temp}F"
+    end
+
 
 end
