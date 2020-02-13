@@ -33,7 +33,7 @@ class UserSession
     end
 
     def logout
-        puts "User #{@current_user.username} has logged out."
+        puts "\nUser #{@current_user.username} has logged out."
         @current_user = nil
     end
 
@@ -45,7 +45,7 @@ class UserSession
         puts "What should be call you?"
         username = gets.chomp
         while find_user(username)
-            puts "User already exists with that name."
+            puts "\nUser already exists with that name."
             puts "Please choose another"
             username = gets.chomp
         end
@@ -58,7 +58,7 @@ class UserSession
         if !self.current_user.temp_pref
             self.ask_temp_pref
         else
-            puts "Your prefered temperature is #{@current_user.temp_pref}"
+            puts "\nYour prefered temperature is #{@current_user.temp_pref}"
             puts "Would you like to change it? Y/n"
             if gets.chomp == 'Y'
                 self.ask_temp_pref
@@ -67,7 +67,7 @@ class UserSession
     end
     
     def ask_temp_pref
-        puts "What temperature do you prefer? 'cold' or 'hot'"
+        puts "\nWhat temperature do you prefer? 'cold' or 'hot'"
         @current_user.set_temp_pref(gets.chomp)
         puts "Current temperature set to #{@current_user.temp_pref}"
     end
@@ -100,7 +100,7 @@ class UserSession
     end
 
     def whoami
-        puts "You're logged in as #{current_user.username}"
+        puts "\nYou're logged in as #{current_user.username}"
     end
 
 end
