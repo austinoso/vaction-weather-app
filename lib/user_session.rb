@@ -94,9 +94,15 @@ class UserSession
 
     def user_locations_list
         UserLocation.all.where(user: @current_user).map do |user_location|
-            puts "=" * 20
-            puts "#{user_location.location.name}, #{user_location.location.country}"
+            location = user_location.location
+            puts "=" * 25
+            puts "#{location.name}, #{location.country}"
+            weather_data = location.weather_api(location.latitude, location.longitude)
+            location.current_temp(weather_data)
+            location.current_humidity(weather_data)
+            location.current_status(weather_data)
         end
+
     end
 
     def whoami
