@@ -8,7 +8,8 @@ class UserSession
             "'search' - Searches for a new Travel Location",
             "'locations' - Returns a list of the users saved locations",
             "'delete' - Deletes the current user",
-            "'update' - Updates the current users username"
+            "'update_name' - Updates the current users username",
+            "'update_password' - Updates the current users username"
         ]
         welcome
     end
@@ -118,9 +119,10 @@ class UserSession
         end
     end
 
-    def update_profile
+    def update_profile_name
         puts "change the username for #{@current_user.username}? If yes answer with Y"
         response = gets.chomp 
+        
         if response == "Y"
             puts "Enter your new username"
             response2 = gets.chomp
@@ -129,6 +131,21 @@ class UserSession
             @current_user.save 
         else
             puts "Ok we will keep your current name of #{@current_user.username}"
+        end
+    end
+
+    def update_profile_password
+        puts "change the password for #{@current_user.username}? If yes answer with Y"
+        response = gets.chomp 
+
+        if response == "Y"
+            puts "Enter your new password"
+            response2 = gets.chomp
+            @current_user.password = response2
+            puts "Your new password is #{response2}"
+            @current_user.save 
+        else
+            puts "Ok we will keep your current password, no changes made."
         end
     end
 
