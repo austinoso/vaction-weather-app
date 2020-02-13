@@ -109,11 +109,8 @@ class UserSession
             puts "=" * 25
             puts "#{location.name}, #{location.country}"
             weather_data = location.weather_api(location.latitude, location.longitude)
-            location.current_temp(weather_data)
-            location.current_humidity(weather_data)
-            location.current_status(weather_data)
+            location.weather(weather_data)
         end
-
     end
 
     def whoami

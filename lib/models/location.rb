@@ -24,6 +24,12 @@ class Location < ActiveRecord::Base
     def current_status(weather_data)
         puts "#{weather_data["currently"]["summary"]}"
     end
+
+    def weather(weather_data)
+        current_temp(weather_data)
+        current_humidity(weather_data)
+        current_status(weather_data)
+    end
     
     
 end
