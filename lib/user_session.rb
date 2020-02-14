@@ -27,6 +27,12 @@ class UserSession
         end
     end
 
+        #sets the @current_user
+    def set_user(username, password)
+        @current_user = User.find_by username: username, password: password
+        puts "You're logged in as #{@current_user.username}"
+    end
+
     #logs out current user (sets @current_user to nil)
     def logout
         puts "\nUser #{@current_user.username} has logged out."
@@ -50,6 +56,11 @@ class UserSession
         puts "Please enter a password."
         password = gets.chomp
         @current_user = User.create(username: username, password: password)
+    end
+
+    #finds if a user is in the db by username
+    def find_user(username)
+        User.find_by username: username
     end
 
     #sets the @current_user.temps
@@ -88,17 +99,6 @@ class UserSession
         else
             true
         end
-    end
-    
-    #finds if a user is in the db by username
-    def find_user(username)
-        User.find_by username: username
-    end
-
-    #sets the @current_user
-    def set_user(username, password)
-        @current_user = User.find_by username: username, password: password
-        puts "You're logged in as #{@current_user.username}"
     end
 
     #generates and saves a location
