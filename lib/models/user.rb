@@ -24,4 +24,8 @@ class User < ActiveRecord::Base
         puts "\nPreferences saved!"
         puts "\nYour maximum and lowest set temperatures are #{self.highest_temp}F and #{self.lowest_temp}F"
     end
+
+    def get_temps
+        temps = { max: self.highest_temp, min: self.lowest_temp}
+    end
 end

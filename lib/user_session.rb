@@ -12,6 +12,7 @@ class UserSession
         puts "#" * 25
     end
     
+    #logs in user
     def login
         puts "Please Login"
         puts "\nEnter username"
@@ -26,15 +27,18 @@ class UserSession
         end
     end
 
+    #logs out current user (sets @current_user to nil)
     def logout
         puts "\nUser #{@current_user.username} has logged out."
         @current_user = nil
     end
 
+    #validates a users login
     def validate(username, password)
         User.find_by username: username, password: password
     end
 
+    #creates a new user and saves to db
     def create_user
         puts "What should be call you?"
         username = gets.chomp
@@ -48,6 +52,7 @@ class UserSession
         @current_user = User.create(username: username, password: password)
     end
 
+    #sets the @current_user.temps
     def set_user_temp
         if @current_user.highest_temp == nil || @current_user.lowest_temp == nil
             puts "\nYou're temperature preferences aren't set."
@@ -63,7 +68,8 @@ class UserSession
             end
         end
     end
-    
+
+    #prompts the user to set their temp
     def prompt_user_to_set_temp
         puts "What temperature is too hot for you?"
         max = gets.chomp
@@ -74,6 +80,7 @@ class UserSession
         end
     end
 
+    #makes sure the user doesn't set the min temp higher than the max
     def validate_temps(max, min)
         if max < min
             puts "Your max temperature can't be lower than your min."
@@ -83,26 +90,29 @@ class UserSession
         end
     end
     
+    #finds if a user is in the db by username
     def find_user(username)
         User.find_by username: username
     end
 
+    #sets the @current_user
     def set_user(username, password)
         @current_user = User.find_by username: username, password: password
         puts "You're logged in as #{@current_user.username}"
     end
 
+    #generates and saves a location
     def generate_new_location
         location = Location.search
         puts "Welcome to beauitful #{location.name}, #{location.country}"
         puts 'Would you like to save this location to your "Travel List"? Y/n'
-
         if gets.chomp == 'Y'
             puts "Location saved!"
             UserLocation.create(user: @current_user, location: location)
         end
     end
 
+    #puts a list of users save locations 
     def user_locations_list
         UserLocation.all.where(user: @current_user).map do |user_location|
             location = user_location.location
@@ -113,10 +123,12 @@ class UserSession
         end
     end
 
+    #tells the user who's logged in
     def whoami
         puts "\nYou're logged in as #{current_user.username}"
     end
 
+    #set useable commands
     def print_commands
         if !@current_user
             @commands = [
@@ -134,14 +146,16 @@ class UserSession
                 "'logout' - Logs out a user",
                 "'whoami' - Tells the users whos currently logged in",
                 "'delete' - Deletes the current user",
-                "'update name' - Updates the current users username",
-                "'update password' - Updates the current users username",
-                "'read profile' - Shows profile of current user" ,
+                "'change name' - Updates the current users username",
+                "'change password' - Updates the current users username",
+                "'profile' - Shows profile of current user" ,
                 "'exit' - Closes the program"
             ]     
         end
         puts @commands
     end
+
+    ###### Commands ######
 
     def start
         while self
@@ -164,11 +178,11 @@ class UserSession
                     self.whoami
                 when "delete"
                     self.can_destroy_profile
-                when "update name"
+                when "change name"
                     self.update_profile_name
-                when "update password"
+                when "change password"
                     self.update_profile_password
-                when "read profile"
+                when "profile"
                     self.read_profile 
                 when "exit"
                     abort("Ending program... goodbye!")
@@ -192,12 +206,11 @@ class UserSession
         end
     end
 
-    ###### New code below ######
+    ###### User Profile Methods ######
     
     def can_destroy_profile
-        puts "delete the profile of #{@current_user.username}? If yes answer with Y"
-        response = gets.chomp()
-        if response == "Y" 
+        puts "Are you sure you want to delete your profile? Y/n"
+        if gets.chomp == "Y" 
             @current_user.delete
             puts "#{@current_user.username} has been deleted"
         else
@@ -206,46 +219,43 @@ class UserSession
     end
 
     def update_profile_name
-        puts "change the username for #{@current_user.username}? If yes answer with Y"
-        response = gets.chomp 
-        
-        if response == "Y"
+        puts "Would you like to change your current username, #{@current_user.username}? Y/n"        
+        if gets.chomp == "Y"
             puts "Enter your new username"
-            response2 = gets.chomp
-            while find_user(response2)
+            new_username = gets.chomp
+            while find_user(new_username)
                 puts "That name isn't currently available."
                 puts "Please enter a different one."
-                response2 = gets.chomp
+                new_username = gets.chomp
             end
-            @current_user.username = response2
-            puts "Your new username is #{response2}"
+            puts "Username changed from #{@current_user.username} to #{new_username}"
+            @current_user.username = new_username
             @current_user.save 
         else
-            puts "Ok we will keep your current name of #{@current_user.username}"
+            puts "Ok, we will keep your current name of #{@current_user.username}"
         end
     end
 
     def update_profile_password
-        puts "change the password for #{@current_user.username}? If yes answer with Y"
-        response = gets.chomp 
-
-        if response == "Y"
+        puts "Would you like to change the password for #{@current_user.username}? If yes answer with Y"
+        if gets.chomp == "Y"
             puts "Enter your new password"
-            response2 = gets.chomp
-            @current_user.password = response2
-            puts "Your new password is #{response2}"
+            @current_user.password = gets.chomp
+            puts "Your new password is #{@current_user.password}"
             @current_user.save 
         else
             puts "Ok we will keep your current password, no changes made."
         end
     end
 
-
     def read_profile 
-        puts "Here is your current profile"
+        puts "\nHere is your current profile"
         puts "username: #{@current_user.username}"
-        puts "Your maximum and lowest set temperatures are #{@current_user.highest_temp}F and #{@current_user.lowest_temp}F"
+        if @current_user.highest_temp || @current_user.lowest_temp
+            puts "Your maximum and lowest set temperatures are #{@current_user.highest_temp}F and #{@current_user.lowest_temp}F"
+        else
+            puts "You haven't set your prefered temperatures yet"
+        end
     end
-
 
 end
