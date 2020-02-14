@@ -21,6 +21,9 @@ class UserSession
         password = gets.chomp
         if validate(username,password)
             set_user(username, password)
+        elsif 
+            username.length < 1 || password.length < 1
+            puts "One of your fields have been left blank, User not saved"
         else
             puts "\nWrong username and password combination."
             puts "Please try again or create an account."
@@ -41,7 +44,9 @@ class UserSession
 
     #validates a users login
     def validate(username, password)
+        
         User.find_by username: username, password: password
+   
     end
 
     #creates a new user and saves to db
