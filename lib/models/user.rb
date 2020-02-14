@@ -33,4 +33,12 @@ class User < ActiveRecord::Base
         UserLocation.find_by location: location, user: self
     end
 
+    def remove_user_location_by_location(location)
+        self.find_user_location_by_location(location).delete
+    end
+
+    def locations?
+        self.saved_locations.empty?
+    end
+
 end

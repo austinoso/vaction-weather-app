@@ -82,10 +82,10 @@ class UserSession
 
     #prompts the user to set their temp
     def prompt_user_to_set_temp
-        puts "What temperature is too hot for you?"
+        puts "\What temperature is too hot for you?"
         max = gets.chomp
-        puts "What temperature is too cold for you?"
-        min = gets.chomp
+        puts "\nWhat temperature is too cold for you?"
+        min = gets.chomp 
         if validate_temps(max, min)
             @current_user.set_temps(max, min)
         end
@@ -94,7 +94,7 @@ class UserSession
     #makes sure the user doesn't set the min temp higher than the max
     def validate_temps(max, min)
         if max < min
-            puts "Your max temperature can't be lower than your min."
+            puts "\nYour max temperature can't be lower than your min."
             set_user_temp
         else
             true
@@ -104,9 +104,9 @@ class UserSession
     #generates and saves a location
     def generate_new_location
         location = Location.search
-        puts "Welcome to beauitful #{location.name}, #{location.country}"
+        puts "\nWelcome to beauitful #{location.name}, #{location.country}"
         puts 'Would you like to save this location to your "Travel List"? Y/n'
-        if gets.chomp == 'Y'
+        if gets.chomp == 'Y' 
             puts "Location saved!"
             UserLocation.create(user: @current_user, location: location)
         end
@@ -114,7 +114,7 @@ class UserSession
 
     #puts a list of users save locations 
     def user_locations_list
-        if @current_user.saved_locations.empty?
+        if @current_user.locations?
             puts "\nNo current locations saved. Run 'search' to start saving locations."
         else
             @current_user.saved_locations.map do |location|
@@ -127,23 +127,36 @@ class UserSession
     end
 
     def user_delete_locations
-        if @current_user.saved_locations.empty?
+        if @current_user.locations?
             puts "\nNo current locations saved. Run 'search' to start saving locations."
         else
-            location_index = 0
-            @current_user.saved_locations.map do |location|
-                puts "#{location_index += 1}. #{location.name}, #{location.country}"    
-            end
-            puts "Type the number of the location you would like to remove from your list"
-            remove = @current_user.saved_locations[gets.chomp.to_i - 1]
-            puts "Are you sure you want to remove #{remove.name}, #{remove.country} from your travel list?"
+            print_locations_with_number
+            remove = @current_user.saved_locations[get_remove_int - 1]
+            puts "Are you sure you want to remove #{remove.name}, #{remove.country} from your travel list? Y/n"
             if gets.chomp == 'Y'
                 puts "Removing #{remove.name}, #{remove.country}."
-                @current_user.find_user_location_by_location(remove).delete
+                @current_user.remove_user_location_by_location(remove)
             else
                 puts "Location remains..."
             end
         end
+    end
+
+    def print_locations_with_number
+        location_index = 0
+        @current_user.saved_locations.map do |location|
+            puts "#{location_index += 1}. #{location.name}, #{location.country}"    
+        end
+    end
+
+    def get_remove_int
+        puts "\nType the number of the location you would like to remove from your list"
+        remove_int = gets.chomp
+        while remove_int.to_i == 0
+            puts "\nPlease enter whole numbers only!"
+            remove_int = gets.chomp
+        end
+        remove_int.to_i
     end
 
     #tells the user who's logged in
@@ -166,10 +179,10 @@ class UserSession
                 "'temp' - Allows the user to change/set their recommended temperature",
                 "'search' - Searches for a new Travel Location",
                 "'locations' - Returns a list of the users saved locations",
-                "'delete location' - Allows a user to delete a location",
+                "'remove location' - Allows a user to delete a location",
                 "'logout' - Logs out a user",
                 "'whoami' - Tells the users whos currently logged in",
-                "'delete' - Deletes the current user",
+                "'delete profile' - Deletes the current user",
                 "'change name' - Updates the current users username",
                 "'change password' - Updates the current users username",
                 "'profile' - Shows profile of current user" ,
@@ -196,13 +209,13 @@ class UserSession
                     self.generate_new_location
                 when "locations"
                     self.user_locations_list
-                when "delete location"
+                when "remove location"
                     self.user_delete_locations
                 when "logout"
                     self.logout
                 when "whoami"
                     self.whoami
-                when "delete"
+                when "delete profile"
                     self.can_destroy_profile
                 when "change name"
                     self.update_profile_name
