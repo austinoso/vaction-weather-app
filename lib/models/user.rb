@@ -48,4 +48,10 @@ class User < ActiveRecord::Base
         }
     end
 
+    def temps?
+        if self.lowest_temp && self.highest_temp
+            return true
+        end
+        false
+    end
 end

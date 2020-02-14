@@ -70,7 +70,7 @@ class UserSession
 
     #sets the @user.temps
     def set_user_temp
-        if @user.highest_temp == nil || @user.lowest_temp == nil
+        if !@user.temps?
             puts "\nYou're temperature preferences aren't set."
             puts "Would you like to add them? Y/n"
             if gets.chomp == 'Y'
@@ -90,7 +90,7 @@ class UserSession
         puts "\What temperature is too hot for you?"
         max = gets.chomp
         puts "\nWhat temperature is too cold for you?"
-        min = gets.chomp 
+        min = gets.chomp
         if validate_temps(max, min)
             @user.set_temps(max, min)
         end
@@ -98,23 +98,29 @@ class UserSession
 
     #makes sure the user doesn't set the min temp higher than the max
     def validate_temps(max, min)
-        if max < min
+        if max.to_f < min.to_f
             puts "\nYour max temperature can't be lower than your min."
             set_user_temp
-        elsif max.length < 1
+        elsif !max
             puts "No max temperature entered. Temperature not saved"
-        elsif min.length < 1
+        elsif !min
             puts "No min temperature entered. Temperature not saved"
         else
             true
         end
     end
 
-    #generates and saves a location
+    #generates and saves a location 
     def generate_new_location
         location = Location.search
         puts "\nWelcome to beauitful #{location.name}, #{location.country}"
         puts 'Would you like to save this location to your "Travel List"? Y/n'
+        weather_data = location.weather_api(location.latitude, location.longitude)
+        if @user.temps?
+            print_weather_with_color(location.weather(weather_data))
+        else
+            print_weather(location.weather(weather_data))        
+        end
         if gets.chomp == 'Y' 
             puts "Location saved!"
             UserLocation.create(user: @user, location: location)
