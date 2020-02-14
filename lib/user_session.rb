@@ -1,5 +1,5 @@
 class UserSession
-    attr_accessor :current_user, :commands
+    attr_accessor :user, :commands
 
     def initialize
         welcome
@@ -30,16 +30,16 @@ class UserSession
         end
     end
 
-        #sets the @current_user
+        #sets the @user
     def set_user(username, password)
-        @current_user = User.find_by username: username, password: password
-        puts "You're logged in as #{@current_user.username}"
+        @user = User.find_by username: username, password: password
+        puts "You're logged in as #{@user.username}"
     end
 
-    #logs out current user (sets @current_user to nil)
+    #logs out current user (sets @user to nil)
     def logout
-        puts "\nUser #{@current_user.username} has logged out."
-        @current_user = nil
+        puts "\nUser #{@user.username} has logged out."
+        @user = nil
     end
 
     #validates a users login
@@ -60,7 +60,7 @@ class UserSession
         end
         puts "Please enter a password."
         password = gets.chomp
-        @current_user = User.create(username: username, password: password)
+        @user = User.create(username: username, password: password)
     end
 
     #finds if a user is in the db by username
@@ -68,16 +68,16 @@ class UserSession
         User.find_by username: username
     end
 
-    #sets the @current_user.temps
+    #sets the @user.temps
     def set_user_temp
-        if @current_user.highest_temp == nil || @current_user.lowest_temp == nil
+        if @user.highest_temp == nil || @user.lowest_temp == nil
             puts "\nYou're temperature preferences aren't set."
             puts "Would you like to add them? Y/n"
             if gets.chomp == 'Y'
                 self.prompt_user_to_set_temp
             end
         else
-            puts "\nYour maximum and lowest set temperatures are #{@current_user.highest_temp}F and #{@current_user.lowest_temp}F"
+            puts "\nYour maximum and lowest set temperatures are #{@user.highest_temp}F and #{@user.lowest_temp}F"
             puts "Would you like to change it? Y/n"
             if gets.chomp == 'Y'
                 self.prompt_user_to_set_temp
@@ -92,7 +92,7 @@ class UserSession
         puts "\nWhat temperature is too cold for you?"
         min = gets.chomp 
         if validate_temps(max, min)
-            @current_user.set_temps(max, min)
+            @user.set_temps(max, min)
         end
     end
 
@@ -117,34 +117,54 @@ class UserSession
         puts 'Would you like to save this location to your "Travel List"? Y/n'
         if gets.chomp == 'Y' 
             puts "Location saved!"
-            UserLocation.create(user: @current_user, location: location)
+            UserLocation.create(user: @user, location: location)
         end
     end
 
     #puts a list of users save locations 
     def user_locations_list
-        if @current_user.locations?
+        if @user.locations?
             puts "\nNo current locations saved. Run 'search' to start saving locations."
         else
-            @current_user.saved_locations.map do |location|
+            @user.saved_locations.map do |location|
                 puts "=" * 25
                 puts "#{location.name}, #{location.country}"
                 weather_data = location.weather_api(location.latitude, location.longitude)
-                location.weather(weather_data)
+                if !@user.get_temps[:max_temp]
+                    print_weather(location.weather(weather_data))
+                else
+                    print_weather_with_color(location.weather(weather_data))
+                end
             end
         end
     end
 
+    def print_weather_with_color(weather)
+        color = :green
+        if weather[:temp] > @user.get_temps[:max_temp] || weather[:temp] < @user.get_temps[:low_temp]
+            color = :red
+        end
+        puts Paint["Current temperature is #{weather[:temp]}F", color]
+        puts "Current humidity is #{weather[:humidity]}%"
+        puts "#{weather[:status]}"
+    end
+
+    def print_weather(weather)
+        puts "Current temperature is #{weather[:temp]}F"
+        puts "Current humidity is #{weather[:humidity]}"
+        puts "#{weather[:status]}"
+    end
+
     def user_delete_locations
-        if @current_user.locations?
+        if @user.locations?
             puts "\nNo current locations saved. Run 'search' to start saving locations."
         else
             print_locations_with_number
-            remove = @current_user.saved_locations[get_remove_int - 1]
+            remove = @user.saved_locations[get_remove_int - 1]
             puts "Are you sure you want to remove #{remove.name}, #{remove.country} from your travel list? Y/n"
             if gets.chomp == 'Y'
                 puts "Removing #{remove.name}, #{remove.country}."
-                @current_user.remove_user_location_by_location(remove)
+                @user.remove_user_location_by_location(remove)
             else
                 puts "Location remains..."
             end
@@ -153,7 +173,7 @@ class UserSession
 
     def print_locations_with_number
         location_index = 0
-        @current_user.saved_locations.map do |location|
+        @user.saved_locations.map do |location|
             puts "#{location_index += 1}. #{location.name}, #{location.country}"    
         end
     end
@@ -170,12 +190,12 @@ class UserSession
 
     #tells the user who's logged in
     def whoami
-        puts "\nYou're logged in as #{current_user.username}"
+        puts "\nYou're logged in as #{user.username}"
     end
 
     #set useable commands
     def print_commands
-        if !@current_user
+        if !@user
             @commands = [
                 "'help' - Displays available commands",
                 "'login' - Prompts a user to login",
@@ -205,7 +225,7 @@ class UserSession
 
     def start
         while self
-            while @current_user
+            while @user
                 puts "\nWhat would like to do?"
                 puts "Type 'help' for a list of commands"
     
@@ -237,7 +257,7 @@ class UserSession
                 end
             end
             
-            while !@current_user
+            while !@user
                 puts "\nPlease 'login' or 'signup' to countinue"
             
                 case gets.chomp
@@ -259,16 +279,16 @@ class UserSession
     def can_destroy_profile
         puts "Are you sure you want to delete your profile? Y/n"
         if gets.chomp == "Y" 
-            @current_user.delete
-            puts "#{@current_user.username} has been deleted"
-            @current_user = nil
+            @user.delete
+            puts "#{@user.username} has been deleted"
+            @user = nil
         else
             puts "Ok deletion averted"
         end
     end
 
     def update_profile_name
-        puts "Would you like to change your current username, #{@current_user.username}? Y/n"        
+        puts "Would you like to change your current username, #{@user.username}? Y/n"        
         if gets.chomp == "Y"
             puts "Enter your new username"
             new_username = gets.chomp
@@ -277,21 +297,21 @@ class UserSession
                 puts "Please enter a different one."
                 new_username = gets.chomp
             end
-            puts "Username changed from #{@current_user.username} to #{new_username}"
-            @current_user.username = new_username
-            @current_user.save 
+            puts "Username changed from #{@user.username} to #{new_username}"
+            @user.username = new_username
+            @user.save 
         else
-            puts "Ok, we will keep your current name of #{@current_user.username}"
+            puts "Ok, we will keep your current name of #{@user.username}"
         end
     end
 
     def update_profile_password
-        puts "Would you like to change the password for #{@current_user.username}? If yes answer with Y"
+        puts "Would you like to change the password for #{@user.username}? If yes answer with Y"
         if gets.chomp == "Y"
             puts "Enter your new password"
-            @current_user.password = gets.chomp
-            puts "Your new password is #{@current_user.password}"
-            @current_user.save 
+            @user.password = gets.chomp
+            puts "Your new password is #{@user.password}"
+            @user.save 
         else
             puts "Ok, we will keep your current password, no changes made."
         end
@@ -299,9 +319,9 @@ class UserSession
 
     def read_profile 
         puts "\nHere is your current profile"
-        puts "username: #{@current_user.username}"
-        if @current_user.highest_temp || @current_user.lowest_temp
-            puts "Your maximum and lowest set temperatures are #{@current_user.highest_temp}F and #{@current_user.lowest_temp}F"
+        puts "username: #{@user.username}"
+        if @user.highest_temp || @user.lowest_temp
+            puts "Your maximum and lowest set temperatures are #{@user.highest_temp}F and #{@user.lowest_temp}F"
         else
             puts "You haven't set your prefered temperatures yet"
         end

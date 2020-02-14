@@ -41,4 +41,11 @@ class User < ActiveRecord::Base
         self.saved_locations.empty?
     end
 
+    def get_temps
+        {
+            :max_temp => self.highest_temp.to_f,
+            :low_temp => self.lowest_temp.to_f
+        }
+    end
+
 end
