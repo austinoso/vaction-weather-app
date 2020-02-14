@@ -23,14 +23,14 @@ class UserSession
             set_user(username, password)
         elsif 
             username.length < 1 || password.length < 1
-            puts "One of your fields have been left blank, User not saved"
+            puts "\nYou must fill in both fields"
         else
             puts "\nWrong username and password combination."
             puts "Please try again or create an account."
         end
     end
 
-        #sets the @user
+    #sets the @user
     def set_user(username, password)
         @user = User.find_by username: username, password: password
         puts "You're logged in as #{@user.username}"
@@ -44,20 +44,13 @@ class UserSession
 
     #validates a users login
     def validate(username, password)
-        
         User.find_by username: username, password: password
-   
     end
 
     #creates a new user and saves to db
     def create_user
         puts "What should be call you?"
-        username = gets.chomp
-        while find_user(username)
-            puts "\nUser already exists with that name."
-            puts "Please choose another"
-            username = gets.chomp
-        end
+        username = set_username
         puts "Please enter a password."
         password = gets.chomp
         @user = User.create(username: username, password: password)
@@ -115,12 +108,7 @@ class UserSession
         location = Location.search
         puts "\nWelcome to beauitful #{location.name}, #{location.country}"
         puts 'Would you like to save this location to your "Travel List"? Y/n'
-        weather_data = location.weather_api(location.latitude, location.longitude)
-        if @user.temps?
-            print_weather_with_color(location.weather(weather_data))
-        else
-            print_weather(location.weather(weather_data))        
-        end
+        display_weather(location)
         if gets.chomp == 'Y' 
             puts "Location saved!"
             UserLocation.create(user: @user, location: location)
@@ -135,13 +123,17 @@ class UserSession
             @user.saved_locations.map do |location|
                 puts "=" * 25
                 puts "#{location.name}, #{location.country}"
-                weather_data = location.weather_api(location.latitude, location.longitude)
-                if !@user.get_temps[:max_temp]
-                    print_weather(location.weather(weather_data))
-                else
-                    print_weather_with_color(location.weather(weather_data))
-                end
+                display_weather(location)
             end
+        end
+    end
+
+    def display_weather(location)
+        weather_data = location.weather_api(location.latitude, location.longitude)
+        if !@user.get_temps[:max_temp]
+            print_weather(location.weather(weather_data))
+        else
+            print_weather_with_color(location.weather(weather_data))
         end
     end
 
@@ -155,7 +147,7 @@ class UserSession
         puts "#{weather[:status]}"
     end
 
-    def print_weather(weather)
+    def print_weather_wo_color(weather)
         puts "Current temperature is #{weather[:temp]}F"
         puts "Current humidity is #{weather[:humidity]}"
         puts "#{weather[:status]}"
@@ -260,6 +252,8 @@ class UserSession
                     self.read_profile 
                 when "exit"
                     abort("Ending program... goodbye!")
+                else
+                    puts "Command not found"
                 end
             end
             
@@ -275,6 +269,8 @@ class UserSession
                     self.print_commands
                 when "exit"
                     abort("Ending program... goodbye!")
+                else
+                    puts "Command not found"
                 end    
             end
         end
@@ -297,18 +293,23 @@ class UserSession
         puts "Would you like to change your current username, #{@user.username}? Y/n"        
         if gets.chomp == "Y"
             puts "Enter your new username"
-            new_username = gets.chomp
-            while find_user(new_username)
-                puts "That name isn't currently available."
-                puts "Please enter a different one."
-                new_username = gets.chomp
-            end
+            new_username = set_username
             puts "Username changed from #{@user.username} to #{new_username}"
             @user.username = new_username
             @user.save 
         else
             puts "Ok, we will keep your current name of #{@user.username}"
         end
+    end
+
+    def set_username
+        username = gets.chomp
+        while find_user(username)
+            puts "That name isn't currently available."
+            puts "Please enter a different one."
+            username = gets.chomp
+        end
+        username
     end
 
     def update_profile_password
