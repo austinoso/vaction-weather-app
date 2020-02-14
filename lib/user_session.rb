@@ -303,6 +303,11 @@ class UserSession
                 puts "Please enter a different one."
                 new_username = gets.chomp
             end
+
+            while new_username.length < 1
+                puts "You left the username field blank, please enter a valid username."
+                new_username = gets.chomp
+            end
             puts "Username changed from #{@user.username} to #{new_username}"
             @user.username = new_username
             @user.save 
