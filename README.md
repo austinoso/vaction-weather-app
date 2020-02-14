@@ -1,5 +1,5 @@
 # Random Vacation App
-###Find your next dream vacation location
+### Find your next dream vacation location
 Basic CLI application that provides a random city to travel to.
 
 ## Current Features
