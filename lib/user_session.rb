@@ -35,10 +35,10 @@ class UserSession
         @user = User.find_by username: username, password: password
         puts "\nYou're logged in as #{@user.username}"
         if !@user.max_humidity
-            puts "You haven't set your max humidity yet. Run 'set humidity' to do so."
+            puts Paint["You haven't set your max humidity yet. Run 'set humidity' to do so.", :red]
         end
         if !@user.temps?
-            puts "You haven't set your prefered temps yet. Run 'set temp' to do so."
+            puts Paint["You haven't set your prefered temps yet. Run 'set temp' to do so.", :red]
         end
     end
 
@@ -130,7 +130,7 @@ class UserSession
         puts 'Would you like to save this location to your "Travel List"? Y/n'
         display_weather(location)
         if gets.chomp == 'Y' 
-            puts "Location saved!"
+            puts "\nLocation saved!"
             UserLocation.create(user: @user, location: location)
         end
     end
@@ -318,7 +318,7 @@ class UserSession
     end
 
     def update_profile_name
-        puts "Would you like to change your current username, #{@user.username}? Y/n"        
+        puts "\nWould you like to change your current username, #{@user.username}? Y/n"        
         if gets.chomp == "Y"
             puts "Enter your new username"
             new_username = set_username
@@ -341,20 +341,25 @@ class UserSession
     end
 
     def update_profile_password
-        puts "Would you like to change the password for #{@user.username}? If yes answer with Y"
+        puts "\nWould you like to change the password for #{@user.username}? Y/n"
         if gets.chomp == "Y"
-            puts "Enter your new password"
+            puts "\nEnter your new password"
             @user.password = gets.chomp
             puts "Your new password is #{@user.password}"
             @user.save 
         else
-            puts "Ok, we will keep your current password, no changes made."
+            puts "\nOk, we will keep your current password, no changes made."
         end
     end
 
     def read_profile 
-        puts "\nHere is your current profile"
+        puts Paint["\nHere is your current profile:", :bright, :blue, :underline]
         puts "username: #{@user.username}"
+        self.display_temps
+        self.display_humid
+    end
+
+    def display_temps
         if @user.highest_temp || @user.lowest_temp
             puts "Your maximum and lowest set temperatures are #{@user.highest_temp}F and #{@user.lowest_temp}F"
         else
@@ -362,4 +367,11 @@ class UserSession
         end
     end
 
+    def display_humid
+        if @user.max_humidity
+            puts "Your maximum humidity is #{@user.max_humidity}%"
+        else
+            puts "You haven't set your max humidity yet"
+        end
+    end
 end
