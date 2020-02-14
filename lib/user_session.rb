@@ -77,7 +77,7 @@ class UserSession
     def validate_temps(max, min)
         if max < min
             puts "Your max temperature can't be lower than your min."
-            set_temp_pref
+            set_user_temp
         else
             true
         end
@@ -133,11 +133,11 @@ class UserSession
                 "'locations' - Returns a list of the users saved locations",
                 "'logout' - Logs out a user",
                 "'whoami' - Tells the users whos currently logged in",
-                "'exit' - Closes the program",
                 "'delete' - Deletes the current user",
                 "'update name' - Updates the current users username",
                 "'update password' - Updates the current users username",
-                "'read profile' - Shows profile of current user" 
+                "'read profile' - Shows profile of current user" ,
+                "'exit' - Closes the program"
             ]     
         end
         puts @commands
@@ -212,6 +212,11 @@ class UserSession
         if response == "Y"
             puts "Enter your new username"
             response2 = gets.chomp
+            while find_user(response2)
+                puts "That name isn't currently available."
+                puts "Please enter a different one."
+                response2 = gets.chomp
+            end
             @current_user.username = response2
             puts "Your new username is #{response2}"
             @current_user.save 
