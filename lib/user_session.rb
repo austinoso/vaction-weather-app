@@ -114,12 +114,35 @@ class UserSession
 
     #puts a list of users save locations 
     def user_locations_list
-        UserLocation.all.where(user: @current_user).map do |user_location|
-            location = user_location.location
-            puts "=" * 25
-            puts "#{location.name}, #{location.country}"
-            weather_data = location.weather_api(location.latitude, location.longitude)
-            location.weather(weather_data)
+        if @current_user.saved_locations.empty?
+            puts "\nNo current locations saved. Run 'search' to start saving locations."
+        else
+            @current_user.saved_locations.map do |location|
+                puts "=" * 25
+                puts "#{location.name}, #{location.country}"
+                weather_data = location.weather_api(location.latitude, location.longitude)
+                location.weather(weather_data)
+            end
+        end
+    end
+
+    def user_delete_locations
+        if @current_user.saved_locations.empty?
+            puts "\nNo current locations saved. Run 'search' to start saving locations."
+        else
+            location_index = 0
+            @current_user.saved_locations.map do |location|
+                puts "#{location_index += 1}. #{location.name}, #{location.country}"    
+            end
+            puts "Type the number of the location you would like to remove from your list"
+            remove = @current_user.saved_locations[gets.chomp.to_i - 1]
+            puts "Are you sure you want to remove #{remove.name}, #{remove.country} from your travel list?"
+            if gets.chomp == 'Y'
+                puts "Removing #{remove.name}, #{remove.country}."
+                @current_user.find_user_location_by_location(remove).delete
+            else
+                puts "Location remains..."
+            end
         end
     end
 
@@ -140,9 +163,10 @@ class UserSession
         else
             @commands = [
                 "'help' - Displays available commands",
-                "'temp' - Allows the user to temp their recommended temperature",
+                "'temp' - Allows the user to change/set their recommended temperature",
                 "'search' - Searches for a new Travel Location",
                 "'locations' - Returns a list of the users saved locations",
+                "'delete location' - Allows a user to delete a location",
                 "'logout' - Logs out a user",
                 "'whoami' - Tells the users whos currently logged in",
                 "'delete' - Deletes the current user",
@@ -172,6 +196,8 @@ class UserSession
                     self.generate_new_location
                 when "locations"
                     self.user_locations_list
+                when "delete location"
+                    self.user_delete_locations
                 when "logout"
                     self.logout
                 when "whoami"
@@ -213,6 +239,7 @@ class UserSession
         if gets.chomp == "Y" 
             @current_user.delete
             puts "#{@current_user.username} has been deleted"
+            @current_user = nil
         else
             puts "Ok deletion averted"
         end
@@ -244,7 +271,7 @@ class UserSession
             puts "Your new password is #{@current_user.password}"
             @current_user.save 
         else
-            puts "Ok we will keep your current password, no changes made."
+            puts "Ok, we will keep your current password, no changes made."
         end
     end
 

@@ -25,7 +25,12 @@ class User < ActiveRecord::Base
         puts "\nYour maximum and lowest set temperatures are #{self.highest_temp}F and #{self.lowest_temp}F"
     end
 
-    def get_temps
-        temps = { max: self.highest_temp, min: self.lowest_temp}
+    def saved_locations
+        UserLocation.all.where(user: self).map { |user_location| user_location.location} 
     end
+
+    def find_user_location_by_location(location)
+        UserLocation.find_by location: location, user: self
+    end
+
 end
