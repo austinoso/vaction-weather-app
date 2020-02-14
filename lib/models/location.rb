@@ -14,21 +14,23 @@ class Location < ActiveRecord::Base
     end
     
     def current_temp(weather_data)
-        puts "Current temp is: #{weather_data["currently"]["temperature"].round(2)}F"
+        weather_data["currently"]["temperature"].round(2)
     end
-    
+
     def current_humidity(weather_data)
-        puts "Current humidity is: #{weather_data["currently"]["humidity"] *100}%"
+        weather_data["currently"]["humidity"] * 100
     end
 
     def current_status(weather_data)
-        puts "#{weather_data["currently"]["summary"]}"
+        weather_data["currently"]["summary"]
     end
 
     def weather(weather_data)
-        current_temp(weather_data)
-        current_humidity(weather_data)
-        current_status(weather_data)
+        {
+            :temp => current_temp(weather_data).round(2),
+            :humidity => current_humidity(weather_data).round(2),
+            :status => current_status(weather_data)
+        }
     end
     
     

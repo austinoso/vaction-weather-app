@@ -5,6 +5,7 @@ require 'cities'
 require 'countries/global'
 require 'pry'
 require 'pp'
+require 'paint'
 
 Cities.data_path = 'db/cities'
 
