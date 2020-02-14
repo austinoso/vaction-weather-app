@@ -7,14 +7,15 @@ class User < ActiveRecord::Base
             puts "Can't set higher than 100%."
             puts "Setting your max humidity to 100%."
             self.max_humidity = 100
-        elsif humidity_percent < 60
-            puts "Can't set lower than 60%."
-            puts "Setting your max humidity to 60%."
-            self.max_humidity = 60
+        elsif humidity_percent < 30
+            puts "Can't set lower than 30%."
+            puts "Setting your max humidity to 30%."
+            self.max_humidity = 30
         else
+            puts "Setting your max humidity to #{humidity_percent}%."
             self.max_humidity = humidity_percent
         end
-        self.saves
+        self.save
     end
 
     def set_temps(max, min)

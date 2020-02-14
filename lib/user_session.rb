@@ -33,7 +33,13 @@ class UserSession
     #sets the @user
     def set_user(username, password)
         @user = User.find_by username: username, password: password
-        puts "You're logged in as #{@user.username}"
+        puts "\nYou're logged in as #{@user.username}"
+        if !@user.max_humidity
+            puts "You haven't set your max humidity yet. Run 'set humidity' to do so."
+        end
+        if !@user.temps?
+            puts "You haven't set your prefered temps yet. Run 'set temp' to do so."
+        end
     end
 
     #logs out current user (sets @user to nil)
@@ -80,12 +86,26 @@ class UserSession
 
     #prompts the user to set their temp
     def prompt_user_to_set_temp
-        puts "\What temperature is too hot for you?"
+        puts "\nWhat temperature is too hot for you?"
         max = gets.chomp
         puts "\nWhat temperature is too cold for you?"
         min = gets.chomp
         if validate_temps(max, min)
             @user.set_temps(max, min)
+        end
+    end
+
+    def prompt_user_to_set_max_humidity
+        if @user.max_humidity
+            puts "\n You're current max humidity is #{@user.max_humidity}"
+            puts "Would you like to change it? Y/n"
+        else
+            puts "\nYou have set yout max humidity yet"
+            puts "Would you like to set it? Y/n"
+        end
+        if gets.chomp == 'Y'
+            puts "\nWhat percent of humidity is too high?"
+            @user.set_max_humidity(gets.chomp.to_f)
         end
     end
 
@@ -130,26 +150,31 @@ class UserSession
 
     def display_weather(location)
         weather_data = location.weather_api(location.latitude, location.longitude)
-        if !@user.get_temps[:max_temp]
-            print_weather(location.weather(weather_data))
-        else
-            print_weather_with_color(location.weather(weather_data))
-        end
+        print_weather_with_color(location.weather(weather_data))
     end
 
     def print_weather_with_color(weather)
-        color = :green
-        if weather[:temp] > @user.get_temps[:max_temp] || weather[:temp] < @user.get_temps[:low_temp]
-            color = :red
-        end
-        puts Paint["Current temperature is #{weather[:temp]}F", color]
-        puts "Current humidity is #{weather[:humidity]}%"
-        puts "#{weather[:status]}"
-    end
+        temp_color = :gray
+        humid_color = :gray
+        
+        if @user.temps?
+            if weather[:temp] > @user.get_temps[:max_temp] || weather[:temp] < @user.get_temps[:low_temp]
+                temp_color = :red
+            elsif weather[:temp] < @user.get_temps[:max_temp] && weather[:temp] > @user.get_temps[:low_temp]
+                temp_color = :green
+            end
+        end 
 
-    def print_weather_wo_color(weather)
-        puts "Current temperature is #{weather[:temp]}F"
-        puts "Current humidity is #{weather[:humidity]}"
+        if @user.max_humidity
+            if weather[:humidity] > @user.max_humidity
+                humid_color = :red
+            elsif weather[:humidity] < @user.max_humidity
+                humid_color = :green
+            end
+        end
+
+        puts Paint["Current temperature is #{weather[:temp]}F", temp_color]
+        puts Paint["Current humidity is #{weather[:humidity]}%", humid_color]
         puts "#{weather[:status]}"
     end
 
@@ -203,7 +228,8 @@ class UserSession
         else
             @commands = [
                 "'help' - Displays available commands",
-                "'temp' - Allows the user to change/set their recommended temperature",
+                "'set temp' - Allows the user to change/set their recommended temperature",
+                "'set humidity' - Allows the user to set/change their recommended humidity percent",
                 "'search' - Searches for a new Travel Location",
                 "'locations' - Returns a list of the users saved locations",
                 "'remove location' - Allows a user to delete a location",
@@ -230,8 +256,10 @@ class UserSession
                 case gets.chomp
                 when "help"
                     self.print_commands
-                when "temp"
+                when "set temp"
                     self.set_user_temp
+                when "set humidity"
+                    self.prompt_user_to_set_max_humidity
                 when "search"
                     self.generate_new_location
                 when "locations"

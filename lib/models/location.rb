@@ -5,7 +5,11 @@ class Location < ActiveRecord::Base
     def self.search
         country = ISO3166::Country.all.sample
         city = country.cities[country.cities.keys.sample]
-        Location.create(name: city.name, country: country.name, latitude: city.latitude, longitude: city.longitude)
+        if city.name == nil || country.name == nil
+            Location.search
+        else
+            Location.create(name: city.name, country: country.name, latitude: city.latitude, longitude: city.longitude)
+        end
     end
 
     def weather_api(latitude,longtitude)
@@ -31,7 +35,5 @@ class Location < ActiveRecord::Base
             :humidity => current_humidity(weather_data).round(2),
             :status => current_status(weather_data)
         }
-    end
-    
-    
+    end  
 end
