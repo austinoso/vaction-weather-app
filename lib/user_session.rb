@@ -333,8 +333,15 @@ class UserSession
         if gets.chomp == "Y"
             puts "Enter your new password"
             @user.password = gets.chomp
+            if @user.password.length < 1
+                puts "Password left blank. Please try again"
+                @user.password = gets.chomp
+                puts "Your new password is #{@user.password}"
+                @user.save 
+            else
             puts "Your new password is #{@user.password}"
             @user.save 
+            end
         else
             puts "Ok, we will keep your current password, no changes made."
         end
