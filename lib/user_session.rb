@@ -58,8 +58,20 @@ class UserSession
             puts "Please choose another"
             username = gets.chomp
         end
+        while username.length < 1
+            puts "You left a field blank, please enter a valid username"
+            puts "What should be call you?"
+            username = gets.chomp
+        end
+        
         puts "Please enter a password."
         password = gets.chomp
+        
+        while password.length < 1
+            puts "Password left blank please try again"
+            puts "Please enter a password."
+            password = gets.chomp
+        end
         @user = User.create(username: username, password: password)
     end
 
