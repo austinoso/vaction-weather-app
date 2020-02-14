@@ -101,6 +101,10 @@ class UserSession
         if max < min
             puts "\nYour max temperature can't be lower than your min."
             set_user_temp
+        elsif max.length < 1
+            puts "No max temperature entered. Temperature not saved"
+        elsif min.length < 1
+            puts "No min temperature entered. Temperature not saved"
         else
             true
         end
